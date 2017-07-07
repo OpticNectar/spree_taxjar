@@ -14,7 +14,12 @@ module TaxjarHelper
     attr_reader :logger
 
     def initialize(path_name, file_name, log_info = nil, schedule = "weekly")
-      @logger ||= Logger.new("#{Rails.root}/log/#{path_name}.log", schedule)
+      if Rails.env.production?
+        @logger ||= Logger.new(STDOUT)
+      else
+        @logger ||= Logger.new("#{Rails.root}/log/#{path_name}.log", schedule)
+      end
+
       @logger.formatter = Pretty.new
       progname(file_name.split("/").last.chomp(".rb"))
       info(log_info) unless log_info.nil?
